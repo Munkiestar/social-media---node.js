@@ -15,8 +15,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use("/api/auth", authRoute);
 
-app.listen(PORT, () => {
-  connectDB();
-  console.log("Connected to DB");
+app.listen(PORT, async () => {
+  await connectDB();
   console.log(`Listening on PORT : ${PORT}`);
 });
