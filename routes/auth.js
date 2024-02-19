@@ -85,5 +85,20 @@ router.get("/logout", async (req, res) => {
 });
 
 // FETCH CURRENT USER
+router.get("/refetch", async (req, res) => {
+  const { token } = req.cookies;
+  jwt.verify(token, process.env.JWT_SECRET, {}, async (err, data) => {
+    // console.log("data: ", data);
+    if (err) res.status(404).json(err);
+
+    try {
+      const id = data._id;
+      const user = await User.findOne({ _id: id });
+      res.status(200).json(user);
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  });
+});
 
 export default router;
