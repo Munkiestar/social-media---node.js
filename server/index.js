@@ -1,6 +1,7 @@
 import express from "express";
 import connectDB from "./db/db.js";
 import cookieParser from "cookie-parser";
+import { errorHandler } from "./middlewares/error.js";
 
 import authRoute from "./routes/auth.js";
 
@@ -14,6 +15,7 @@ app.get("/", (req, res) => {
 app.use(express.json());
 app.use(cookieParser());
 app.use("/api/auth", authRoute);
+app.use(errorHandler);
 
 app.listen(PORT, async () => {
   await connectDB();
