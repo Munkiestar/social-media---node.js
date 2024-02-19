@@ -21,3 +21,6 @@ app.listen(PORT, async () => {
   await connectDB();
   console.log(`Listening on PORT : ${PORT}`);
 });
+
+// nastaviti
+// https://youtu.be/4xidxpXlzUU?t=6295
