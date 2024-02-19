@@ -33,6 +33,31 @@ router.post("/register", async (req, res) => {
 });
 
 // LOGIN
+router.post("/login", async (req, res) => {
+  try {
+    let user;
+    const { email, username, password } = req.body;
+
+    if (email) {
+      user = await User.findOne({ email: email });
+    } else {
+      user = await User.findOne({ username: username });
+    }
+
+    console.log("login - USER: ", user);
+
+    if (!user) return res.status(404).json("User not found");
+
+    // compare user's login password with database password
+    const match = await bcrypt.compare(password, user.password);
+
+    if (!match) return res.status(401).json("Wrong Credentials!");
+
+    res.status(200).json("Logged in successfully!");
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
 
 // LOGOUT
 
