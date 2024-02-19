@@ -72,6 +72,17 @@ router.post("/login", async (req, res) => {
 });
 
 // LOGOUT
+router.get("/logout", async (req, res) => {
+  try {
+    // clear the cookie
+    res
+      .clearCookie("token", { sameSite: "none", secure: true })
+      .status(200)
+      .json("User logged out successfully!");
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
 
 // FETCH CURRENT USER
 
