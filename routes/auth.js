@@ -1,5 +1,6 @@
 import express from "express";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 import User from "../models/User.js";
 
@@ -36,7 +37,7 @@ router.post("/register", async (req, res) => {
 router.post("/login", async (req, res) => {
   try {
     let user;
-    const { email, username, password } = req.body;
+    const { email, username, password: loginPass } = req.body;
 
     if (email) {
       user = await User.findOne({ email: email });
@@ -44,16 +45,27 @@ router.post("/login", async (req, res) => {
       user = await User.findOne({ username: username });
     }
 
-    console.log("login - USER: ", user);
+    // console.log("login - USER: ", user);
 
-    if (!user) return res.status(404).json("User not found");
+    if (!user) return res.status(404).json(user);
 
     // compare user's login password with database password
-    const match = await bcrypt.compare(password, user.password);
+    const match = await bcrypt.compare(loginPass, user.password);
 
     if (!match) return res.status(401).json("Wrong Credentials!");
 
-    res.status(200).json("Logged in successfully!");
+    // remove password from user object we are sending back
+    // i.e. extract all data except password
+    const { password, ...data } = user?._doc;
+
+    console.log("login - USER._doc: DATA: ", data);
+
+    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: process.env.JWT_EXPIRE,
+    });
+    res.cookie("token", token).status(200).json(data);
+
+    console.log("token: ", token);
   } catch (err) {
     res.status(500).json(err);
   }
