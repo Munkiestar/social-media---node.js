@@ -93,10 +93,3 @@ export const refetchUserController = async (req, res, next) => {
     }
   });
 };
-
-export default {
-  registerController,
-  loginController,
-  logoutController,
-  refetchUserController,
-};
