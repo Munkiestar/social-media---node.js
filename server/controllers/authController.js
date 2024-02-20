@@ -53,14 +53,12 @@ export const loginController = async (req, res, next) => {
     // i.e. extract all data except password
     const { password, ...data } = user?._doc;
 
-    console.log("login - USER._doc: DATA: ", data);
+    // console.log("login - USER._doc: DATA: ", data);
 
     const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
       expiresIn: process.env.JWT_EXPIRE,
     });
     res.cookie("token", token).status(200).json(data);
-
-    console.log("token: ", token);
   } catch (err) {
     next(err);
   }
