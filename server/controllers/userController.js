@@ -72,3 +72,39 @@ export const followUserController = async (req, res, next) => {
     next(err);
   }
 };
+
+export const unFollowUserController = async (req, res, next) => {
+  const { userId } = req.params;
+  const { _id } = req.body;
+
+  try {
+    if (userId === _id)
+      throw new CustomError("You can not unfollow yourself!", 500);
+
+    const userToUnFollow = await User.findById(userId);
+    const loggedInUser = await User.findById(_id);
+
+    // console.log("userToUnFollow: ", userToUnFollow);
+    // console.log("loggedInUser: ", loggedInUser);
+    if (!userToUnFollow || !loggedInUser)
+      throw new CustomError("User not found!", 404);
+
+    if (!loggedInUser.following.includes(userId))
+      throw new CustomError("Not following this user!", 400);
+
+    loggedInUser.following = loggedInUser.following.filter(
+      (id) => id.toString() !== userId,
+    );
+    userToUnFollow.followers = userToUnFollow.followers.filter(
+      (id) => id.toString() !== _id,
+    );
+
+    // save both users
+    await loggedInUser.save();
+    await userToUnFollow.save();
+
+    res.status(200).json({ message: "Successfully unfollowed user!" });
+  } catch (err) {
+    next(err);
+  }
+};
