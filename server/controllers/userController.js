@@ -147,3 +147,36 @@ export const blockUserController = async (req, res, next) => {
     next(err);
   }
 };
+
+export const unBlockUserController = async (req, res, next) => {
+  const { userId } = req.params;
+  const { _id } = req.body;
+
+  try {
+    if (userId === _id)
+      throw new CustomError("You can't unblock yourself!", 500);
+
+    const userToUnblock = await User.findById(userId);
+    // logged in user
+    const loggedUser = await User.findById(_id);
+
+    if (!userToUnblock || !loggedUser)
+      throw new CustomError("User not found!", 404);
+
+    if (!loggedUser.blockList.includes(userId))
+      throw new CustomError("This user is unblocked!", 400);
+
+    //unblock user
+    loggedUser.blockList = loggedUser.blockList.filter(
+      (id) => id.toString() !== userId,
+    );
+
+    // save both users to db
+    await loggedUser.save();
+
+    // send response
+    res.status(200).json({ message: "Successfully unblocked user!" });
+  } catch (err) {
+    next(err);
+  }
+};
