@@ -180,3 +180,24 @@ export const unBlockUserController = async (req, res, next) => {
     next(err);
   }
 };
+
+export const getBlockedUsersController = async (req, res, next) => {
+  const { userId } = req.params;
+
+  try {
+    const user = await User.findById(userId).populate(
+      "blockList",
+      "username fullName profilePicture",
+    );
+
+    if (!user) throw new CustomError("User not found!", 404);
+
+    const blockedList = user.blockList;
+
+    if (!blockedList.length) throw new CustomError("No users blocked!", 400);
+
+    res.status(200).json(blockedList);
+  } catch (err) {
+    next(err);
+  }
+};
