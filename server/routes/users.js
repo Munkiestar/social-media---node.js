@@ -5,6 +5,7 @@ import {
   updateUserController,
   followUserController,
   unFollowUserController,
+  blockUserController,
 } from "../controllers/userController.js";
 
 const router = express.Router();
@@ -21,4 +22,8 @@ router.post("/follow/:userId", followUserController);
 // UNFOLLOW USER
 router.post("/unfollow/:userId", unFollowUserController);
 
+// BLOCK USER
+router.post("/block/:userId", blockUserController);
+
+// UNBLOCK USER
 export default router;

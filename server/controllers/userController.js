@@ -108,3 +108,42 @@ export const unFollowUserController = async (req, res, next) => {
     next(err);
   }
 };
+
+export const blockUserController = async (req, res, next) => {
+  const { userId } = req.params;
+  const { _id } = req.body;
+
+  try {
+    if (userId === _id) throw new CustomError("You can't block yourself!", 500);
+
+    const userToBlock = await User.findById(userId);
+    // logged in user
+    const loggedUser = await User.findById(_id);
+
+    if (!userToBlock || !loggedUser)
+      throw new CustomError("User not found!", 404);
+
+    if (loggedUser.blockList.includes(userId))
+      throw new CustomError("This user is already blocked!", 400);
+
+    // block user
+    loggedUser.blockList.push(userId);
+
+    // case if this user is following this 'to be' blocked user
+    loggedUser.following = loggedUser.following.filter(
+      (id) => id.toString() !== userId,
+    );
+    userToBlock.followers = userToBlock.followers.filter(
+      (id) => id.toString() !== _id,
+    );
+
+    // save both users to db
+    await loggedUser.save();
+    await userToBlock.save();
+
+    // send response
+    res.status(200).json({ message: "Successfully blocked user!" });
+  } catch (err) {
+    next(err);
+  }
+};
